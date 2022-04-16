@@ -281,6 +281,14 @@
 ; *** EXERCISE Insert low level algorithm for CmdSearch here ***
 ; CmdPrint:
 ; *** EXERCISE Insert low level algorithm for CmdPrint here ***
+; Print value field of each node in list p
+;    p := *p.next
+; PrintValueFieldLoop:
+;    if p = nil goto PrintValueFieldLoopDone
+;    WriteValIntFixedWidth ((*p).value)
+;    p := (*p).next
+; PrintValueFieldLoopDone
+;    goto CmdCaseDone
 ;--------------------------------------------------------------------
 ; procedure BuildHeap ()
 ;    p := &heap = &AllocationArea + StackSize
