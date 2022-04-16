@@ -279,6 +279,26 @@
 ;    goto CmdCaseDone
 ; CmdSearch:
 ; *** EXERCISE Insert low level algorithm for CmdSearch here ***
+; Determine whether x occurs in list p
+;    found := False
+;    p := *p.next    ; point to first element of list
+; SearchListLoop:
+;    if p = nil then goto SearchListLoopDone
+;    if found = true then goto SearchListLoopDone
+;    if (*p).value /= x then goto SearchListNoMatch
+;    found := 1
+; SearchListNoMatch
+;    p := (*p).next
+;    goto SearchListLoop
+; SearchListLoopDone
+;    if found = 1 then goto SearchListThen
+; SearchListElse
+;    write "no"
+;    goto SearchListAfterIf
+; SearchListThen
+;    write "yes"
+; SearchListAfterIf
+;    goto CmdCaseDone
 ; CmdPrint:
 ; *** EXERCISE Insert low level algorithm for CmdPrint here ***
 ; Print value field of each node in list p
