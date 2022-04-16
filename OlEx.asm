@@ -284,9 +284,10 @@
 ; Print value field of each node in list p
 ;    p := *p.next
 ; PrintValueFieldLoop:
-;    if p = nil goto PrintValueFieldLoopDone
+;    if p = nil then goto PrintValueFieldLoopDone
 ;    WriteValIntFixedWidth ((*p).value)
 ;    p := (*p).next
+;    goto PrintValueFieldLoop
 ; PrintValueFieldLoopDone
 ;    goto CmdCaseDone
 ;--------------------------------------------------------------------
@@ -566,7 +567,25 @@ CmdPrint
     jal    R13,WriteValIntFixedWidth[R0]  ; write integer
     jal    R13,WriteNewLine[R0]
 ; *** EXERCISE Insert assembly language for CmdPrint here ***
-    jump   CmdDone[R0]         ; go to finish command
+; Register usage
+; R5 = p      - current node in the list
+; Initialise registers
+    load   R5,CmdArgP[R0]      ; R5 := p (pointer to first node in list)
+    load   R5,1[R5]
+CPloop
+; if p = nil then goto CPloopDone
+    cmp    R5,R0               ; compare p, nil
+    jumpeq CPloopDone[R0]      ; if p = nil then goto CPloopDone
+; WriteValIntFixedWidth ((*p).value)
+    load   R1,0[R5]            ; copy the argument to be passed
+    jal    R13,WriteValIntFixedWidth[R0]  ; write integer
+; p := (*p).next
+    load   R5,1[R5]            ; point to next node in list
+; goto PrintValueFieldLoopCPloop
+    jump   CPloop[R0]          ; goto CPloop
+CPloopDone
+    jal    R13,WriteNewLine[R0]           ; new line
+    jump   CmdDone[R0]          ; go to finish command
 ;--------------------------------------------------
 ; BuildHeap
 ;--------------------------------------------------
