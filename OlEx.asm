@@ -8,6 +8,9 @@
 ; The exercise is to fill in the missing parts.  These are all marked
 ; with a comment of the form
 ; *** EXERCISE Insert <description of what to insert> here ***
+;Program OrderedListsEXERCUSE
+;Derek Todd
+;2719352T
 ;--------------------------------------------------------------------
 ; General description of the program
 ; The program performs a sequence of operations on ordered lists; the
@@ -257,6 +260,23 @@
 ;    goto CmdCaseDone
 ; CmdDelete:
 ; *** EXERCISE Insert low level algorithm for delete here ***
+; Delete first node whose value is x; p is header
+;    q := (*p).next
+; DeleteFirstNodeLoop:
+;    if q = nil then goto DeleteFirstNodeLoopDone
+;    if (*q).value = x then goto DeleteFirstNodeThen
+; DeleteFirstNodeElse
+;    p := q
+;    q := (*q).next
+;    goto DeleteFirstNodeAfterIf
+; DeleteFirstNodeThen
+;    *p.next := *q.next
+;    ReleaseNode(q)
+;    q := nil
+; DeleteFirstNodeAfterIf
+;    goto DeleteFirstNodeLoop
+; DeleteFirstNodeLoopDone
+;    goto CmdCaseDone
 ; CmdSearch:
 ; *** EXERCISE Insert low level algorithm for CmdSearch here ***
 ; CmdPrint:
