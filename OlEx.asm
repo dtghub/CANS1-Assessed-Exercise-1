@@ -580,6 +580,7 @@ CmdSearch
 ; R10 = message address of text characters for trap message output
 ; R11 = string length for trap message output
 ; Initialise registers
+    load R5,CmdArgX[R0]         ;R5 := x
 
 ; Determine whether x occurs in list p
     add     R7,R0,R0            ; found := False
@@ -587,9 +588,9 @@ CmdSearch
     load    R6,1[R6]
 CSloop
     cmp     R6,R0               ; compare p, nil
-    jumpeq  SLloopDone[R0]      ; if p = nil then goto SLloopDone
+    jumpeq  CSloopDone[R0]      ; if p = nil then goto SLloopDone
     cmp     R7,R0               ; compare found, nil
-    jumpne  SLloopDone[R0]      ; if found /= nil then goto SLloopDone
+    jumpne  CSloopDone[R0]      ; if found /= nil then goto SLloopDone
 
 ; if (*p).value /= x then goto SearchListNoMatch
     load R8,0[R6]
@@ -614,7 +615,7 @@ CSelse
     lea    R9,2[R0]            ; R9 := trap code for write
     lea    R10,CSnoMsg[R0]    ; R10 := &"no\n"
     lea    R11,3[R0]           ; R11 := string length
-    trap   R8,R9,R10     
+    trap   R9,R10,R11     
 ;    goto SearchListAfterIf
     jump CSafterIf
 
@@ -624,7 +625,7 @@ CSthen
     lea    R9,2[R0]            ; R9 := trap code for write
     lea    R10,CSyesMsg[R0]    ; R10 := &"yes\n"
     lea    R11,4[R0]           ; R11 := string length
-    trap   R8,R9,R10     
+    trap   R9,R10,R11     
 
 CSafterIf
     jump   CmdDone[R0]         ; go to finish command
