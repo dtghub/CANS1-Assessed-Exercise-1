@@ -572,75 +572,84 @@ CmdSearch
     jal    R13,WriteNewLine[R0]
 ; *** EXERCISE Insert assembly language for CmdSearch here ***
 ; Register usage
-; R5 = x     - value to find in the list
-; R6 = p     - current node in the list
-; R7 = found - boolean to identify if x has been matched in list
-; R8 = temp
-; R9 = trap code
-; R10 = message address of text characters for trap message output
-; R11 = string length for trap message output
+; R4 = x     - value to find in the list
+; R5 = p     - current node in the list
+; R6 = found - boolean to identify if x has been matched in list
+; R7 = temp
+; R8 = trap code
+; R9 = message address of text characters for trap message output
+; R10 = string length for trap message output
 ; Initialise registers
-    load R5,CmdArgX[R0]         ;R5 := x
+    load R4,CmdArgX[R0]         ;R4 := x
 
 ; Determine whether x occurs in list p
-    add     R7,R0,R0            ; found := False
-    load    R6,CmdArgP[R0]   ; p := *p.next   ; point to first node of list
-    load    R6,1[R6]
+    add     R6,R0,R0            ; found := False
+    load    R5,CmdArgP[R0]   ; p := *p.next   ; point to first node of list
+    load    R5,1[R5]
 CSloop
-    cmp     R6,R0               ; compare p, nil
+    cmp     R5,R0               ; compare p, nil
     jumpeq  CSloopDone[R0]      ; if p = nil then goto SLloopDone
-    cmp     R7,R0               ; compare found, nil
+    cmp     R6,R0               ; compare found, nil
     jumpne  CSloopDone[R0]      ; if found /= nil then goto SLloopDone
 
 ; if (*p).value /= x then goto SearchListNoMatch
-    load R8,0[R6]
-    cmp R5,R8
+    load R7,0[R5]
+    cmp R4,R7
     jumpne CSnoMatch[R0]
 
-    lea R7,1[R0]                ; found := 1
+    lea R6,1[R0]                ; found := 1
 
 CSnoMatch
 
-    load R6,1[R6]               ; p := (*p).next
+    load R5,1[R5]               ; p := (*p).next
     jump CSloop                 ; goto CSloop
 
 CSloopDone
 ;    if found /= 0 then goto SearchListThen
-    cmp R7,R0
+    cmp R6,R0
     jumpne CSthen[R0]
 
 CSelse
 
-;    write "no"
-    lea    R9,2[R0]            ; R9 := trap code for write
-    lea    R10,CSnoMsg[R0]    ; R10 := &"no\n"
-    lea    R11,3[R0]           ; R11 := string length
-    trap   R9,R10,R11     
+;    write "Not found"
+    lea    R8,2[R0]            ; R8 := trap code for write
+    lea    R9,CSnoMsg[R0]    ; R9 := &"Not found\n"
+    lea    R10,10[R0]           ; R10 := string length
+    trap   R8,R9,R10     
 ;    goto SearchListAfterIf
     jump CSafterIf
 
 CSthen
 
-;    write "yes"
-    lea    R9,2[R0]            ; R9 := trap code for write
-    lea    R10,CSyesMsg[R0]    ; R10 := &"yes\n"
-    lea    R11,4[R0]           ; R11 := string length
-    trap   R9,R10,R11     
+;    write "Found"
+    lea    R8,2[R0]            ; R8 := trap code for write
+    lea    R9,CSyesMsg[R0]    ; R9 := &"Found\n"
+    lea    R10,6[R0]           ; R10 := string length
+    trap   R8,R9,R10     
 
 CSafterIf
     jump   CmdDone[R0]         ; go to finish command
 
 CSyesMsg
 ; for character codes, see https://www.ascii.cl/htmlcodes.htm
-    data   121  ; 'y'
-    data   101  ; 'e'
-    data   115  ; 's'
+    data   70   ; 'F'
+    data  111   ; 'o'
+    data  117   ; 'u'
+    data  110   ; 'n'
+    data  100   ; 'd'
     data    10  ; '\n'
 
 CSnoMsg
 ; for character codes, see https://www.ascii.cl/htmlcodes.htm
-    data   110  ; 'n'
+    data   78   ; 'N'
     data   111  ; 'o'
+    data  116   ; 't'
+    data   32   ; ' '
+    data  102   ; 'f'
+    data  111   ; 'o'
+    data  117   ; 'u'
+    data  110   ; 'n'
+    data  100   ; 'd'
     data    10  ; '\n'
 
 
