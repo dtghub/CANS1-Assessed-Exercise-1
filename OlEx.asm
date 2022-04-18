@@ -575,9 +575,10 @@ CDthen
     load    R7,1[R6]               ; temp := *q.next
     store   R7,1[R5]              ; *p.next := temp
 ;    ReleaseNode(q)
-    lea     R1,0[R6]            
+    lea     R1,0[R5]            ; pass p as R1
+    lea     R2,0[R6]            ; pass q as R2
     jal     R13,ReleaseNode[R0]
-    add     R6,R0,R0            ; q := nil
+    add     R6,R0,R0            ; q := nil i.e. end the loop
 
 CDafterIf
     jump    CDloop[R0]           ; goto start of loop again
@@ -823,6 +824,37 @@ HeapMsg
 ;--------------------------------------------------------------------
 ReleaseNode
 ; *** EXERCISE Insert assembly language for ReleaseNode here ***
+; Register usage
+; R1 = p     - current node in the list
+; R2 = q     - next node in the list
+; R3 = temp1
+
+; remove node from list
+    load R3,1[R2]       ;get address for node after q
+    store R3,1[R1]      ;point next address after node p to node after q
+
+; Add node to the heap
+    load R3,avail[R0]   ;get address of first node in heap
+    store R3,1[R2]      ;insert link into node q pointing to previous start of heap 
+
+    lea R3,1[R0]        ; temp2 := 1
+    lea R3,avail[R3]    ; temp2 := avail + 1
+
+    store R3,1[R1]      ; &(avail + 1) := (*p).next
+
+    jump 0[R13]            ; all done
+
+
+
+
+
+
+
+
+
+
+
+
     jump   0[R13]              ; return
 ; search (key)
 ;   p := &database
