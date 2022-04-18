@@ -546,6 +546,43 @@ CmdDelete
     jal    R13,WriteValIntFixedWidth[R0]  ; write integer
     jal    R13,WriteNewLine[R0]
 ; *** EXERCISE Insert assembly language for CmdDelete here ***
+; Register usage
+; R4 = x     - value to find in the list
+; R5 = p     - current node in the list
+; R6 = q     - next node in the list
+; R7 = temp
+; Initialise registers
+    load   R4,CmdArgX[R0]      ; R4 := x (value to insert)
+    load   R5,CmdArgP[R0]      ; R5 := p (pointer to current node in list)
+; Delete first node whose value is x; p is header
+    load   R6,1[R5]            ; q := (*p).next
+
+CDloop
+; if q = nil || x /= (*q).value then goto CDthen
+    cmp    R6,R0               ; compare q, nil
+    jumpeq CDdone[R0]          ; if p = nil then goto CDdone
+    load   R7,0[R6]            ; temp := (*q).value
+    cmp    R4,R7               ; compare x, (*q).value
+    jumpeq CDthen[R0]          ; if x = (*q).value then goto CDthen
+
+CDelse
+    load    R5,0[R6]              ; p := q
+    load    R6,1[R6]           ; q := (*q.next
+    jump    CDafterIf          ; goto CDafterIf
+
+CDthen
+;    *p.next := *q.next
+    load    R7,1[R6]               ; temp := *q.next
+    store   R7,1[R5]              ; *p.next := temp
+;    ReleaseNode(q)
+    lea     R1,0[R6]            
+    jal     R13,ReleaseNode[R0]
+    add     R6,R0,R0            ; q := nil
+
+CDafterIf
+    jump    CDloop[R0]           ; goto start of loop again
+
+CDdone
     jump   CmdDone[R0]         ; go to finish command
 ;--------------------------------------------------------------------
 ; CmdSearch
