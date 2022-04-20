@@ -617,56 +617,46 @@ CmdSearch
 ; R9 = message address of text characters for trap message output
 ; R10 = string length for trap message output
 ; Initialise registers
-    load R4,CmdArgX[R0]         ;R4 := x
-
+    load    R4,CmdArgX[R0]      ; R4 := x
+    load    R5,CmdArgP[R0]      ; R5 := p
+    add     R6,R0,R0            ; R6 = found := False
 ; Determine whether x occurs in list p
-    add     R6,R0,R0            ; found := False
-    load    R5,CmdArgP[R0]   ; p := *p.next   ; point to first node of list
-    load    R5,1[R5]
+; p := *p.next   ; point to first node of list
+    load    R5,1[R5]            ; p := *p.next
 CSloop
     cmp     R5,R0               ; compare p, nil
-    jumpeq  CSloopDone[R0]      ; if p = nil then goto SLloopDone
+    jumpeq  CSloopDone[R0]      ; if p = nil then goto CSloopDone
     cmp     R6,R0               ; compare found, nil
-    jumpne  CSloopDone[R0]      ; if found /= nil then goto SLloopDone
-
-; if (*p).value /= x then goto SearchListNoMatch
-    load R7,0[R5]
-    cmp R4,R7
-    jumpne CSnoMatch[R0]
-
-    lea R6,1[R0]                ; found := 1
-
+    jumpne  CSloopDone[R0]      ; if found /= nil then goto CSloopDone
+; if (*p).value /= x then goto CSnoMatch
+    load    R7,0[R5]            ; R7 = temp := (*p).value
+    cmp     R4,R7               ; compare x, (*p).value
+    jumpne  CSnoMatch[R0]       ; if (*p).value /= x then goto CSnoMatch
+; else
+    lea     R6,1[R0]            ; found := 1
 CSnoMatch
-
-    load R5,1[R5]               ; p := (*p).next
-    jump CSloop                 ; goto CSloop
-
+    load    R5,1[R5]            ; p := (*p).next
+    jump    CSloop              ; goto CSloop
 CSloopDone
-;    if found /= 0 then goto SearchListThen
-    cmp R6,R0
-    jumpne CSthen[R0]
-
-CSelse
-
-;    write "Not found"
-    lea    R8,2[R0]            ; R8 := trap code for write
-    lea    R9,CSnoMsg[R0]    ; R9 := &"Not found\n"
-    lea    R10,10[R0]           ; R10 := string length
-    trap   R8,R9,R10     
-;    goto SearchListAfterIf
-    jump CSafterIf
-
+; if found /= 0 then goto CSthen
+    cmp     R6,R0               ; compare found, nil
+    jumpne  CSthen[R0]          ; if found /= 0 then goto CSthen
+; CSelse
+; write "Not found"
+    lea     R8,2[R0]            ; R8 := 2 = trap code for write
+    lea     R9,CSnoMsg[R0]      ; R9 := &"Not found\n"
+    lea     R10,10[R0]          ; R10 := string length
+    trap    R8,R9,R10           ; write "Not found\n"
+; goto CSafterIf
+    jump    CSafterIf           ; goto CSafterIf
 CSthen
-
-;    write "Found"
-    lea    R8,2[R0]            ; R8 := trap code for write
-    lea    R9,CSyesMsg[R0]    ; R9 := &"Found\n"
-    lea    R10,6[R0]           ; R10 := string length
-    trap   R8,R9,R10     
-
+; write "Found"
+    lea     R8,2[R0]            ; R8 := trap code for write
+    lea     R9,CSyesMsg[R0]     ; R9 := &"Found\n"
+    lea     R10,6[R0]           ; R10 := string length
+    trap    R8,R9,R10           ; write "Found\n"
 CSafterIf
     jump   CmdDone[R0]         ; go to finish command
-
 CSyesMsg
 ; for character codes, see https://www.ascii.cl/htmlcodes.htm
     data   70   ; 'F'
@@ -674,12 +664,11 @@ CSyesMsg
     data  117   ; 'u'
     data  110   ; 'n'
     data  100   ; 'd'
-    data    10  ; '\n'
-
+    data   10   ; '\n'
 CSnoMsg
 ; for character codes, see https://www.ascii.cl/htmlcodes.htm
     data   78   ; 'N'
-    data   111  ; 'o'
+    data  111   ; 'o'
     data  116   ; 't'
     data   32   ; ' '
     data  102   ; 'f'
@@ -687,10 +676,7 @@ CSnoMsg
     data  117   ; 'u'
     data  110   ; 'n'
     data  100   ; 'd'
-    data    10  ; '\n'
-
-
-
+    data   10   ; '\n'
 ;--------------------------------------------------------------------
 ; CmdPrint
 ;--------------------------------------------------------------------
