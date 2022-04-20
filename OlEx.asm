@@ -560,13 +560,13 @@ CmdDelete
 CDloop
 ; if q = nil || x /= (*q).value then goto CDthen
     cmp    R6,R0               ; compare q, nil
-    jumpeq CDdone[R0]          ; if p = nil then goto CDdone
+    jumpeq CDdone[R0]          ; if q = nil then goto CDdone
     load   R7,0[R6]            ; temp := (*q).value
     cmp    R4,R7               ; compare x, (*q).value
     jumpeq CDthen[R0]          ; if x = (*q).value then goto CDthen
 
 CDelse
-    load    R5,0[R6]              ; p := q
+    lea     R5,0[R6]           ; p := q
     load    R6,1[R6]           ; q := (*q.next
     jump    CDafterIf          ; goto CDafterIf
 
@@ -575,8 +575,7 @@ CDthen
     load    R7,1[R6]               ; temp := *q.next
     store   R7,1[R5]              ; *p.next := temp
 ;    ReleaseNode(q)
-    lea     R1,0[R5]            ; pass p as R1
-    lea     R2,0[R6]            ; pass q as R2
+    lea     R1,0[R6]            ; pass q as R1
     jal     R13,ReleaseNode[R0]
     add     R6,R0,R0            ; q := nil i.e. end the loop
 
@@ -825,9 +824,33 @@ HeapMsg
 ReleaseNode
 ; *** EXERCISE Insert assembly language for ReleaseNode here ***
 ; Register usage
-; R1 = p     - current node in the list
-; R2 = q     - next node in the list
-; R3 = temp1
+; R1 = q     - argument passed into function (node q to be deleted)
+; R8 = avail
+; R9 = &avail
+; R10 = temp
+
+
+;    (*q).next := avail
+
+    load R8,avail[R0]
+    store R8,1[R1]
+
+    ;    avail := q
+    lea R9,avail[R0]
+    lea R10,0[R1]
+    store R10,0[R9]
+
+
+
+
+;    return
+    jump   0[R13]              ; return
+
+
+
+
+
+
 
 ; remove node from list
     load R3,1[R2]       ;get address for node after q
