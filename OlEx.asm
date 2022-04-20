@@ -576,7 +576,7 @@ CDthen
     store   R7,1[R5]              ; *p.next := temp
 ;    ReleaseNode(q)
     lea     R1,0[R6]            ; pass q as R1
-    jal     R13,ReleaseNode[R0]
+    jal     R13,ReleaseNode[R0] ;goto ReleaseNode
     add     R6,R0,R0            ; q := nil i.e. end the loop
 
 CDafterIf
@@ -825,59 +825,42 @@ ReleaseNode
 ; *** EXERCISE Insert assembly language for ReleaseNode here ***
 ; Register usage
 ; R1 = q     - argument passed into function (node q to be deleted)
-; R8 = avail
+; R8 = *avail
 ; R9 = &avail
 ; R10 = temp
-
-
-;    (*q).next := avail
-
-    load R8,avail[R0]
-    store R8,1[R1]
-
-    ;    avail := q
-    lea R9,avail[R0]
-    lea R10,0[R1]
-    store R10,0[R9]
-
-
-
-
-;    return
-    jump   0[R13]              ; return
-
-
-
-
-
-
-
-; remove node from list
-    load R3,1[R2]       ;get address for node after q
-    store R3,1[R1]      ;point next address after node p to node after q
-
-; Add node to the heap
-    load R3,avail[R0]   ;get address of first node in heap
-    store R3,1[R2]      ;insert link into node q pointing to previous start of heap 
-
-    lea R3,1[R0]        ; temp2 := 1
-    lea R3,avail[R3]    ; temp2 := avail + 1
-
-    store R3,1[R1]      ; &(avail + 1) := (*p).next
-
-    jump 0[R13]            ; all done
-
-
-
-
-
-
-
-
-
-
-
-
+; Structure of stack frame, frame size = 6
+;    5[R14]  R10 = temp
+;    4[R14]  R9 = &avail
+;    3[R14]  R8 = *avail
+;    2[R14]  save R1 = pointer to the node q to be released to the heap
+;    1[R14]  return address
+;    0[R14]  pointer to previous stack frame
+; Create stack frame
+    store  R14,0[R12]          ; save dynamic link
+    add    R14,R12,R0          ; stack pointer := stack top
+    lea    R12,6[R14]          ; stack top := stack ptr + frame size
+    cmp    R12,R11             ; stack top ~ stack limit
+    jumpgt StackOverflow[R0]   ; if top>limit then goto stack overflow
+    store  R13,1[R14]          ; save return address
+    store  R1,2[R14]           ; save R1
+    store  R8,3[R14]           ; save R8 = *avail
+    store  R9,4[R14]           ; save R9 = &avail
+    store  R10,5[R14]          ; save R10 = temp
+; (*q).next := avail
+    load   R8,avail[R0]        ; R8 := *avail
+    store  R8,1[R1]            ; (*q).next := R8
+; avail := q
+    lea    R9,avail[R0]        ; R9 := &avail
+    lea    R10,0[R1]           ; R10 = temp := q
+    store  R10,0[R9]           ; avail := R10
+; return
+    load   R1,2[R14]           ; restore R1
+    load   R8,3[R14]           ; restore R8
+    load   R9,4[R14]           ; restore R9
+    load   R10,5[R14]          ; restore R10
+    load   R13,1[R14]          ; restore return address
+    add    R12,R14,R0          ; R12 := R14, restore stack top
+    load   R14,0[R14]          ; pop stack frame
     jump   0[R13]              ; return
 ; search (key)
 ;   p := &database
