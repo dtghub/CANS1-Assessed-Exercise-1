@@ -708,22 +708,23 @@ CmdPrint
 ; *** EXERCISE Insert assembly language for CmdPrint here ***
 ; Register usage
 ; R5 = p      - current node in the list
+; Print value field of each node in list p
 ; Initialise registers
     load   R5,CmdArgP[R0]      ; R5 := p (pointer to first node in list)
-    load   R5,1[R5]
+    load   R5,1[R5]            ; R5 := *p.next
 CPloop
 ; if p = nil then goto CPloopDone
     cmp    R5,R0               ; compare p, nil
     jumpeq CPloopDone[R0]      ; if p = nil then goto CPloopDone
 ; WriteValIntFixedWidth ((*p).value)
-    load   R1,0[R5]            ; copy the argument to be passed
-    jal    R13,WriteValIntFixedWidth[R0]  ; write integer
+    load   R1,0[R5]            ; copy the argument to be passed into R1
+    jal    R13,WriteValIntFixedWidth[R0]  ; write integer in R1
 ; p := (*p).next
     load   R5,1[R5]            ; point to next node in list
 ; goto PrintValueFieldLoopCPloop
     jump   CPloop[R0]          ; goto CPloop
 CPloopDone
-    jal    R13,WriteNewLine[R0]           ; new line
+    jal    R13,WriteNewLine[R0] ; output linefeed (/n)
     jump   CmdDone[R0]          ; go to finish command
 ;--------------------------------------------------
 ; BuildHeap
