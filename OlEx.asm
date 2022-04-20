@@ -578,7 +578,7 @@ CDthen
 CDafterIf
     jump    CDloop[R0]         ; goto start of loop again
 CDdone
-    jump   CmdDone[R0]         ; go to finish command
+    jump    CmdDone[R0]        ; goto finish command
 ;--------------------------------------------------------------------
 ; CmdSearch
 ;--------------------------------------------------------------------
@@ -806,7 +806,7 @@ HeapMsg
 ReleaseNode
 ; *** EXERCISE Insert assembly language for ReleaseNode here ***
 ; Register usage
-; R1 = q     - argument passed into function (node q to be deleted)
+; R1 = q - argument passed into function (node q to be deleted)
 ; R8 = *avail
 ; R9 = &avail
 ; R10 = temp
