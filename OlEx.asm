@@ -556,7 +556,6 @@ CmdDelete
     load   R5,CmdArgP[R0]      ; R5 := p (pointer to current node in list)
 ; Delete first node whose value is x; p is header
     load   R6,1[R5]            ; q := (*p).next
-
 CDloop
 ; if q = nil || x /= (*q).value then goto CDthen
     cmp    R6,R0               ; compare q, nil
@@ -564,24 +563,20 @@ CDloop
     load   R7,0[R6]            ; temp := (*q).value
     cmp    R4,R7               ; compare x, (*q).value
     jumpeq CDthen[R0]          ; if x = (*q).value then goto CDthen
-
-CDelse
+CDelse      ;Symbol unused but left uncommented to aid readability
     lea     R5,0[R6]           ; p := q
-    load    R6,1[R6]           ; q := (*q.next
+    load    R6,1[R6]           ; q := (*q).next
     jump    CDafterIf          ; goto CDafterIf
-
 CDthen
-;    *p.next := *q.next
-    load    R7,1[R6]               ; temp := *q.next
-    store   R7,1[R5]              ; *p.next := temp
-;    ReleaseNode(q)
-    lea     R1,0[R6]            ; pass q as R1
+; *p.next := *q.next
+    load    R7,1[R6]           ; temp := *q.next
+    store   R7,1[R5]           ; *p.next := temp
+; ReleaseNode(q)
+    lea     R1,0[R6]           ; pass q as R1
     jal     R13,ReleaseNode[R0] ;goto ReleaseNode
-    add     R6,R0,R0            ; q := nil i.e. end the loop
-
+    add     R6,R0,R0           ; q := nil i.e. end the loop
 CDafterIf
-    jump    CDloop[R0]           ; goto start of loop again
-
+    jump    CDloop[R0]         ; goto start of loop again
 CDdone
     jump   CmdDone[R0]         ; go to finish command
 ;--------------------------------------------------------------------
@@ -603,7 +598,7 @@ CmdSearch
     lea    R10,5[R0]           ; R10 := string length
     trap   R8,R9,R10           ; write " for \n"
 ; print x
-;     add    R1,R5,R0       ; R1 = argument = x
+; add    R1,R5,R0       ; R1 = argument = x
     load   R1,CmdArgX[R0]      ; R1 = argument = x
     jal    R13,WriteValIntFixedWidth[R0]  ; write integer
     jal    R13,WriteNewLine[R0]
@@ -632,7 +627,7 @@ CSloop
     load    R7,0[R5]            ; R7 = temp := (*p).value
     cmp     R4,R7               ; compare x, (*p).value
     jumpne  CSnoMatch[R0]       ; if (*p).value /= x then goto CSnoMatch
-; else
+CSifElse     ;Symbol unused but left uncommented to aid readability
     lea     R6,1[R0]            ; found := 1
 CSnoMatch
     load    R5,1[R5]            ; p := (*p).next
@@ -641,7 +636,7 @@ CSloopDone
 ; if found /= 0 then goto CSthen
     cmp     R6,R0               ; compare found, nil
     jumpne  CSthen[R0]          ; if found /= 0 then goto CSthen
-; CSelse
+CSelse     ;Symbol unused but left uncommented to aid readability
 ; write "Not found"
     lea     R8,2[R0]            ; R8 := 2 = trap code for write
     lea     R9,CSnoMsg[R0]      ; R9 := &"Not found\n"
